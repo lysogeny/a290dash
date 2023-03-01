@@ -89,29 +89,29 @@ def search_decorator(search_function):
 @app.callback(Output("selected-gene-id", "options"),
               Input("dataset-name", "value"),
               Input("selected-gene-id", "search_value"))
-@search_decorator(lambda x: DATA.available_gene_ids(x))
-def update_gene_options(search_value, options):
+def update_gene_options(dataset_name, search_value):
+    if not search_value:
+        raise PreventUpdate
+    options = DATA.available_gene_ids(dataset_name)
     return [o for o in options if search_value in o]
 
 @app.callback(Output("selected-embedding", "options"),
-              Input("dataset-name", "value"),
-              Input("selected-embedding", "search_value"))
-@search_decorator(lambda x: DATA.available_embedding_keys(x))
-def update_embedding_options(search_value, options):
-    return [o for o in options if search_value in o]
+              Input("dataset-name", "value"))
+def update_embedding_options(dataset_name):
+    return DATA.available_embedding_keys(dataset_name)
 
 @app.callback(Output("selected-grouping-var", "options"),
-              Input("dataset-name", "value"),
-              Input("selected-grouping-var", "search_value"))
-@search_decorator(lambda x: DATA.available_group_vars(x))
-def update_group_options(search_value, options):
-    return [o for o in options if search_value in o]
+              Input("dataset-name", "value"))
+def update_group_options(dataset_name):
+    return DATA.available_group_vars(dataset_name)
 
 @app.callback(Output("graph-umap", "figure"),
               Input("dataset-name", "value"),
               Input("selected-gene-id", "value"),
               Input("selected-embedding", "value"))
 def update_umap(dataset_name, gene_id, embedding_name):
+    if not dataset_name or not embedding_name:
+        return px.scatter(template="simple_white")
     plot_data = DATA.embedding_df(dataset_name, embedding_name)
     if gene_id:
         plot_data = plot_data.join(DATA.gene_counts_df(dataset_name, gene_id))
@@ -126,6 +126,8 @@ def update_umap(dataset_name, gene_id, embedding_name):
               Input("selected-gene-id", "value"),
               Input("selected-grouping-var", "value"))
 def update_boxplot(dataset_name, gene_id, group_var):
+    if not dataset_name or not gene_id or not group_var:
+        return px.scatter(template="simple_white")
     plot_data = DATA.grouping_df(dataset_name, group_var)
     if gene_id:
         plot_data = plot_data.join(DATA.gene_counts_df(dataset_name, gene_id))
