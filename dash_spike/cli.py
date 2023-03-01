@@ -1,0 +1,2 @@
+def run():
+    """Run app"""

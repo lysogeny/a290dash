@@ -11,6 +11,8 @@ python = "^3.10"
 pandas = "^1.5"
 dash = "^2.8"
 
+[tool.poetry.scripts]
+a290dash = "dash_spike.cli:run"
 
 [build-system]
 requires = ["poetry-core"]
