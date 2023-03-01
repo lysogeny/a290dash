@@ -8,7 +8,6 @@ import plotly.express as px
 import pandas as pd
 import numpy as np
 
-data = anndata.read_h5ad("data/data.h5ad")
 
 class DataCollection:
     """Collection of datasets"""
@@ -57,11 +56,11 @@ class DataCollection:
         return list(self.data.keys())
 
 
-DATA = DataCollection({"SmartSeq3GLAST": data})
+DATA = DataCollection({"SmartSeq3GLAST": anndata.read_h5ad("data/data.h5ad")})
 
-app = Dash(name=__name__, server=True)
+APP = Dash(name=__name__, server=True)
 
-app.layout = html.Div([
+APP.layout = html.Div([
     html.H6("Data"),
     html.Div([
         dcc.Dropdown(DATA.keys(), DATA.keys()[0], id="dataset-name"),
@@ -86,7 +85,7 @@ def search_decorator(search_function):
 
 
 
-@app.callback(Output("selected-gene-id", "options"),
+@APP.callback(Output("selected-gene-id", "options"),
               Input("dataset-name", "value"),
               Input("selected-gene-id", "search_value"))
 def update_gene_options(dataset_name, search_value):
@@ -95,17 +94,17 @@ def update_gene_options(dataset_name, search_value):
     options = DATA.available_gene_ids(dataset_name)
     return [o for o in options if search_value in o]
 
-@app.callback(Output("selected-embedding", "options"),
+@APP.callback(Output("selected-embedding", "options"),
               Input("dataset-name", "value"))
 def update_embedding_options(dataset_name):
     return DATA.available_embedding_keys(dataset_name)
 
-@app.callback(Output("selected-grouping-var", "options"),
+@APP.callback(Output("selected-grouping-var", "options"),
               Input("dataset-name", "value"))
 def update_group_options(dataset_name):
     return DATA.available_group_vars(dataset_name)
 
-@app.callback(Output("graph-umap", "figure"),
+@APP.callback(Output("graph-umap", "figure"),
               Input("dataset-name", "value"),
               Input("selected-gene-id", "value"),
               Input("selected-embedding", "value"))
@@ -121,7 +120,7 @@ def update_umap(dataset_name, gene_id, embedding_name):
                      scaleanchor="x", scaleratio=1)
     return fig
 
-@app.callback(Output("graph-boxes", "figure"),
+@APP.callback(Output("graph-boxes", "figure"),
               Input("dataset-name", "value"),
               Input("selected-gene-id", "value"),
               Input("selected-grouping-var", "value"))
@@ -138,4 +137,4 @@ def update_boxplot(dataset_name, gene_id, group_var):
     return fig
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    APP.run(debug=True)
