@@ -61,16 +61,20 @@ DATA = DataCollection({"SmartSeq3GLAST": anndata.read_h5ad("data/data.h5ad")})
 APP = Dash(name=__name__, server=True)
 
 APP.layout = html.Div([
-    html.H6("Data"),
-    html.Div([
-        dcc.Dropdown(DATA.keys(), DATA.keys()[0], id="dataset-name"),
-        dcc.Dropdown(id="selected-gene-id"),
-        dcc.Dropdown(id="selected-embedding"),
-        dcc.Dropdown(id="selected-grouping-var"),
-    ]),
-    html.Br(),
-    html.Div([dcc.Graph(id="graph-umap"), dcc.Graph(id="graph-boxes")], id="plots"),
-])
+    html.Header([
+        html.Div([dcc.Dropdown(DATA.keys(), DATA.keys()[0], id="dataset-name", className="float-child", placeholder="Dataset..."),
+                  dcc.Dropdown(id="selected-embedding", className="float-child", placeholder="Embedding..."),
+                  dcc.Dropdown(id="selected-grouping-var", className="float-child", placeholder="Grouping variable..."),
+                  dcc.Dropdown(id="selected-gene-id", className="float-child", placeholder="Gene Name...")], 
+                 className="float-container"),
+    ], className="row"),
+    html.Section([
+        html.Div([dcc.Graph(id="graph-umap", className="flex-child graph-output"), 
+                  dcc.Graph(id="graph-boxes", className="flex-child graph-output")], 
+                 className="flex-container"),
+    ], className="row"),
+    html.Footer(["DKFZ/A290 Dash App"], className="row"),
+], className="box")
 
 @APP.callback(Output("selected-gene-id", "options"),
               Input("dataset-name", "value"),

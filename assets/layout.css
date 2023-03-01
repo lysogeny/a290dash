@@ -1,0 +1,54 @@
+/* TODO:
+ * - Figure out how to actually do this
+ */
+html, 
+body {
+    height: 100%;
+    margin: 0;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+#react-entry-point,
+#_dash-global-error-container,
+#_dash-app-content {
+    height: 100%;
+    margin: 0;
+}
+.box {
+    display: flex;
+    flex-flow: column;
+    height: 100%;
+}
+.box header.row {
+    flex: 0 1 auto;
+}
+.box section.row {
+    flex: 1 1 auto;
+}
+.box footer.row {
+    flex: 0 1 40px;
+}
+
+.flex-container {
+    display: flex;
+    height: 100%;
+}
+.flex-child {
+    flex: 1;
+    height: 100%;
+}
+.flex-child:first-child {
+    margin-right: 20pxq;
+}
+.inputs {
+    width: 800px;
+}
+.float-container {
+    padding: 10px;
+    width: 100%;
+}
+.float-child {
+    float: left;
+    width: 25%;
+    padding: 10px;
+}
