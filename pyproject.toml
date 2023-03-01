@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "dash-spike"
+version = "0.1.0"
+description = "Spike for external dash app of Molecular Neurobiology DKFZ"
+authors = ["Jooa <git@jooa.xyz>"]
+readme = "README.md"
+packages = [{include = "dash_spike"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pandas = "^1.5"
+dash = "^2.8"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
