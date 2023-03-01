@@ -69,21 +69,8 @@ APP.layout = html.Div([
         dcc.Dropdown(id="selected-grouping-var"),
     ]),
     html.Br(),
-    dcc.Graph(id="graph-umap"),
-    dcc.Graph(id="graph-boxes"),
+    html.Div([dcc.Graph(id="graph-umap"), dcc.Graph(id="graph-boxes")], id="plots"),
 ])
-
-def search_decorator(search_function):
-    def inner_function(function):
-        def callback_function(dataset_name, search_value):
-            if not search_value:
-                raise PreventUpdate
-            options = search_function(dataset_name)
-            return function(search_value, options)
-        return callback_function
-    return inner_function
-
-
 
 @APP.callback(Output("selected-gene-id", "options"),
               Input("dataset-name", "value"),
