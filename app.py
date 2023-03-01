@@ -1,3 +1,5 @@
+import os
+
 from dash import Dash, dcc, html, Input, Output
 from dash.exceptions import PreventUpdate
 
@@ -49,14 +51,14 @@ class DataCollection:
         data = self.data[dataset_name]
         catvars = data.obs.columns[data.obs.dtypes == "category"]
         catvar_counts = pd.Series([len(data.obs[v].cat.categories) for v in catvars])
-        catvars = catvars[(catvar_counts < 16) & (catvar_counts > 1)]
+        catvars = catvars[(catvar_counts < 24) & (catvar_counts > 1)]
         return catvars
 
     def keys(self):
         return list(self.data.keys())
 
-
-DATA = DataCollection({"SmartSeq3GLAST": anndata.read_h5ad("data/data.h5ad")})
+DATASETS = filter(lambda x: x.endswith(".h5ad"), os.listdir("data"))
+DATA = DataCollection({dataset.split(".")[0]: anndata.read_h5ad(f"data/{dataset}") for dataset in DATASETS})
 
 APP = Dash(name=__name__, server=True)
 
