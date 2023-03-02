@@ -120,6 +120,9 @@ def update_umap(dataset_name, gene_id, embedding_name):
 def update_boxplot(dataset_name, gene_id, group_vars):
     if not dataset_name or not gene_id or not group_vars:
         return px.scatter(template="simple_white")
+    if len(group_vars) > 3:
+        group_vars = group_vars[0:3]
+    group_vars = [v for v in group_vars if v in DATA.available_group_vars(dataset_name)]
     plot_data = DATA.grouping_df(dataset_name, group_vars)
     if gene_id:
         plot_data = plot_data.join(DATA.gene_counts_df(dataset_name, gene_id))
