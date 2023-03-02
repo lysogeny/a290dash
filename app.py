@@ -57,8 +57,13 @@ class DataCollection:
     def keys(self):
         return list(self.data.keys())
 
-DATASETS = filter(lambda x: x.endswith(".h5ad"), os.listdir("data"))
-DATA = DataCollection({dataset.split(".")[0]: anndata.read_h5ad(f"data/{dataset}", backed="r") for dataset in DATASETS})
+if "DASH_DATA_DIR" in os.environ:
+    DASH_DATA_DIR = os.environ["DASH_DATA_DIR"]
+else:
+    DASH_DATA_DIR = "data"
+
+DATASETS = filter(lambda x: x.endswith(".h5ad"), os.listdir(DASH_DATA_DIR))
+DATA = DataCollection({dataset.split(".")[0]: anndata.read_h5ad(f"{DASH_DATA_DIR}/{dataset}", backed="r") for dataset in DATASETS})
 
 APP = Dash(name=__name__, server=True)
 
@@ -137,4 +142,4 @@ def update_boxplot(dataset_name, gene_id, group_vars):
     return fig
 
 if __name__ == "__main__":
-    APP.run(debug=True)
+    APP.run(debug=True if "DASH_DEBUG" in os.environ else False)
