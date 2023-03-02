@@ -14,7 +14,7 @@ import numpy as np
 class DataCollection:
     """Collection of datasets"""
 
-    def __init__(self, data):
+    def __init__(self, data: dict):
         self.data = data
 
     def gene_counts_df(self, dataset_name, gene_id):
@@ -35,9 +35,9 @@ class DataCollection:
         plot_data = pd.DataFrame(plot_data[:,0:2], index=data.obs_names, columns=["x", "y"])
         return plot_data
 
-    def grouping_df(self, dataset_name, group_var):
+    def grouping_df(self, dataset_name, group_vars):
         data = self.data[dataset_name]
-        group_data = data.obs[[group_var]].rename(columns={group_var: "x"})
+        group_data = data.obs[group_vars]
         return group_data
 
     def available_gene_ids(self, dataset_name):
@@ -58,7 +58,7 @@ class DataCollection:
         return list(self.data.keys())
 
 DATASETS = filter(lambda x: x.endswith(".h5ad"), os.listdir("data"))
-DATA = DataCollection({dataset.split(".")[0]: anndata.read_h5ad(f"data/{dataset}") for dataset in DATASETS})
+DATA = DataCollection({dataset.split(".")[0]: anndata.read_h5ad(f"data/{dataset}", backed="r") for dataset in DATASETS})
 
 APP = Dash(name=__name__, server=True)
 
@@ -66,7 +66,7 @@ APP.layout = html.Div([
     html.Header([
         html.Div([dcc.Dropdown(DATA.keys(), DATA.keys()[0], id="dataset-name", className="float-child", placeholder="Dataset..."),
                   dcc.Dropdown(id="selected-embedding", className="float-child", placeholder="Embedding..."),
-                  dcc.Dropdown(id="selected-grouping-var", className="float-child", placeholder="Grouping variable..."),
+                  dcc.Dropdown(id="selected-grouping-var", className="float-child", placeholder="Grouping variable...", multi=True),
                   dcc.Dropdown(id="selected-gene-id", className="float-child", placeholder="Gene Name...")], 
                  className="float-container"),
     ], className="row"),
@@ -117,16 +117,20 @@ def update_umap(dataset_name, gene_id, embedding_name):
               Input("dataset-name", "value"),
               Input("selected-gene-id", "value"),
               Input("selected-grouping-var", "value"))
-def update_boxplot(dataset_name, gene_id, group_var):
-    if not dataset_name or not gene_id or not group_var:
+def update_boxplot(dataset_name, gene_id, group_vars):
+    if not dataset_name or not gene_id or not group_vars:
         return px.scatter(template="simple_white")
-    plot_data = DATA.grouping_df(dataset_name, group_var)
+    plot_data = DATA.grouping_df(dataset_name, group_vars)
     if gene_id:
         plot_data = plot_data.join(DATA.gene_counts_df(dataset_name, gene_id))
     else:
         plot_data = plot_data.join(DATA.gene_counts_dummy_df(dataset_name))
-    fig = px.box(x="x", y="Expression", data_frame=plot_data, template="simple_white")
-    fig.update_xaxes(title_text=group_var)
+    fig = px.box(y="Expression", 
+                 x=group_vars[0], 
+                 color=group_vars[1] if len(group_vars) > 1 else None,
+                 facet_col=group_vars[2] if len(group_vars) > 2 else None,
+                 data_frame=plot_data, 
+                 template="simple_white")
     return fig
 
 if __name__ == "__main__":
