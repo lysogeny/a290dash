@@ -71,6 +71,8 @@ APP.layout = html.Div([
     html.Header([
         html.Div([dcc.Dropdown(DATA.keys(), DATA.keys()[0], id="dataset-name", className="float-child", placeholder="Dataset..."),
                   dcc.Dropdown(id="selected-embedding", className="float-child", placeholder="Embedding..."),
+                  dcc.Dropdown(["gene", "categorical"], id="selected-embedding-source", className="float-child", placeholder="Embedding colour source..."),
+                  dcc.Dropdown(id="selected-embedding-var", className="float-child", placeholder="Embedding colour variable..."),
                   dcc.Dropdown(id="selected-grouping-var", className="float-child", placeholder="Grouping variable...", multi=True),
                   dcc.Dropdown(id="selected-gene-id", className="float-child", placeholder="Gene Name...")], 
                  className="float-container"),
@@ -102,17 +104,35 @@ def update_embedding_options(dataset_name):
 def update_group_options(dataset_name):
     return DATA.available_group_vars(dataset_name)
 
+@APP.callback(Output("selected-embedding-var", "options"),
+              Input("dataset-name", "value"))
+def update_embedding_cat_options(dataset_name):
+    return DATA.available_group_vars(dataset_name)
+
 @APP.callback(Output("graph-umap", "figure"),
               Input("dataset-name", "value"),
               Input("selected-gene-id", "value"),
-              Input("selected-embedding", "value"))
-def update_umap(dataset_name, gene_id, embedding_name):
+              Input("selected-embedding", "value"),
+              Input("selected-embedding-var", "value"),
+              Input("selected-embedding-source", "value"))
+def update_umap(dataset_name, gene_id, embedding_name, group_var, colour_source):
     if not dataset_name or not embedding_name:
         return px.scatter(template="simple_white")
     plot_data = DATA.embedding_df(dataset_name, embedding_name)
-    if gene_id:
+    if colour_source == "gene" and gene_id:
         plot_data = plot_data.join(DATA.gene_counts_df(dataset_name, gene_id))
-    fig = px.scatter(x="x", y="y", color="Expression" if gene_id else None, data_frame=plot_data, template="simple_white")
+        fig = px.scatter(x="x", y="y", color="Expression" if gene_id else None, 
+                         data_frame=plot_data, template="simple_white")
+        fig.update_xaxes(title_text="", showticklabels=False, tickvals=[])
+        fig.update_yaxes(title_text="", showticklabels=False, tickvals=[],
+                         scaleanchor="x", scaleratio=1)
+    elif colour_source == "categorical" and group_var:
+        plot_data = plot_data.join(DATA.grouping_df(dataset_name, group_var))
+        fig = px.scatter(x="x", y="y", color=group_var if group_var else None, 
+                         data_frame=plot_data, template="simple_white")
+    else:
+        fig =  px.scatter(x="x", y="y", data_frame=plot_data,
+                          template="simple_white")
     fig.update_xaxes(title_text="", showticklabels=False, tickvals=[])
     fig.update_yaxes(title_text="", showticklabels=False, tickvals=[],
                      scaleanchor="x", scaleratio=1)
