@@ -10,6 +10,7 @@ python = "^3.10"
 pandas = "^1.5"
 dash = "^2.8"
 anndata = "^0.8.0"
+PyYAML = "^6.0"
 
 [tool.poetry.scripts]
 a290dash = "dash_spike.cli:run"

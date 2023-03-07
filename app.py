@@ -1,4 +1,5 @@
 import os
+import yaml
 
 from dash import Dash, dcc, html, Input, Output
 from dash.exceptions import PreventUpdate
@@ -65,10 +66,26 @@ else:
 DATASETS = filter(lambda x: x.endswith(".h5ad"), os.listdir(DASH_DATA_DIR))
 DATA = DataCollection({dataset.split(".")[0]: anndata.read_h5ad(f"{DASH_DATA_DIR}/{dataset}", backed="r") for dataset in DATASETS})
 
+META_DEFAULT = {
+    "filename": "",
+    "reference": "",
+    "display": "A290 Molecular Neurobiology Data Viewer",
+}
+
+if os.path.exists("data/datasets.yaml"):
+    with open("data/datasets.yaml") as connection:
+        DATAMETA = yaml.safe_load(connection)
+    DATAMETA = {d["file"].split(".")[0]: d for d in DATAMETA}
+else:
+    DATAMETA = {d: META_DEFAULT for d in DATA.keys()}
+
+
 APP = Dash(name=__name__, server=True)
 
 APP.layout = html.Div([
     html.Header([
+        html.H2("A290 Molecular Neurobiology Data Viewer", id="data-name"),
+        html.Div("", id="data-info"),
         html.Div([
             dcc.Dropdown(DATA.keys(), DATA.keys()[0], id="dataset-name", className="", placeholder="Dataset..."), 
         ], className=""),
@@ -92,6 +109,16 @@ APP.layout = html.Div([
     ], className="flex-container"),
     html.Footer(["DKFZ/A290 Dash App"], className="row"),
 ], className="box")
+
+@APP.callback(Output("data-info", "children"),
+              Input("dataset-name", "value"))
+def update_info(dataset_name):
+    content = DATAMETA[dataset_name]["reference"]
+    display = DATAMETA[dataset_name]["display"]
+    return html.P([
+        f"{display}: ",
+        html.A(f"{content}", href=content),
+    ])
 
 @APP.callback(Output("selected-gene-id", "options"),
               Input("dataset-name", "value"),
