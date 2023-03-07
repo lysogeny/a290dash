@@ -33,9 +33,14 @@ body {
     display: flex;
     height: 100%;
 }
-.flex-child {
+.flex-child, .dash-dropdown {
     flex: 1;
     height: 100%;
+}
+.dash-dropdown {
+    padding-top: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
 }
 .flex-child:first-child {
     margin-right: 20pxq;

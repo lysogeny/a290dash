@@ -69,19 +69,27 @@ APP = Dash(name=__name__, server=True)
 
 APP.layout = html.Div([
     html.Header([
-        html.Div([dcc.Dropdown(DATA.keys(), DATA.keys()[0], id="dataset-name", className="float-child", placeholder="Dataset..."),
-                  dcc.Dropdown(id="selected-embedding", className="float-child", placeholder="Embedding..."),
-                  dcc.Dropdown(["gene", "categorical"], id="selected-embedding-source", className="float-child", placeholder="Embedding colour source..."),
-                  dcc.Dropdown(id="selected-embedding-var", className="float-child", placeholder="Embedding colour variable..."),
-                  dcc.Dropdown(id="selected-grouping-var", className="float-child", placeholder="Grouping variable...", multi=True),
-                  dcc.Dropdown(id="selected-gene-id", className="float-child", placeholder="Gene Name...")], 
-                 className="float-container"),
+        html.Div([
+            dcc.Dropdown(DATA.keys(), DATA.keys()[0], id="dataset-name", className="", placeholder="Dataset..."), 
+        ], className=""),
     ], className="row"),
     html.Section([
-        html.Div([dcc.Graph(id="graph-umap", className="flex-child graph-output"), 
-                  dcc.Graph(id="graph-boxes", className="flex-child graph-output")], 
-                 className="flex-container"),
-    ], className="row"),
+        html.Div([
+            html.Div([
+                dcc.Dropdown(id="selected-embedding", className="flex-child", placeholder="Embedding..."),
+                dcc.Dropdown(["gene", "categorical"], id="selected-embedding-source", className="flex-child", placeholder="Embedding colour source..."),
+                dcc.Dropdown(id="selected-embedding-var", className="flex-child", placeholder="Embedding colour variable...")
+            ], className="flex-container"),
+            dcc.Graph(id="graph-umap", className="graph-output"),
+        ], className="flex-child"), 
+        html.Div([
+            html.Div([
+                dcc.Dropdown(id="selected-grouping-var", className="flex-child", placeholder="Grouping variable...", multi=True),
+                dcc.Dropdown(id="selected-gene-id", className="flex-child", placeholder="Gene Name..."),
+            ], className="flex-container"),
+            dcc.Graph(id="graph-boxes", className="graph-output"),
+        ], className="flex-child"), 
+    ], className="flex-container"),
     html.Footer(["DKFZ/A290 Dash App"], className="row"),
 ], className="box")
 
