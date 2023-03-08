@@ -60,7 +60,10 @@ class DataCollection:
     def keys(self):
         return list(self.data.keys())
 
-logging.basicConfig(level=logging.DEBUG if "DASH_DEBUG" in os.environ else logging.ERROR)
+if "DASH_DEBUG" in os.environ:
+    logging.basicConfig(level=logging.DEBUG)
+else:
+    logging.basicConfig(level=logging.INFO)
 
 if "DASH_DATA_DIR" in os.environ:
     DASH_DATA_DIR = os.environ["DASH_DATA_DIR"]
