@@ -83,10 +83,12 @@ DATA = DataCollection({dataset.split(".")[0]: anndata.read_h5ad(f"{DASH_DATA_DIR
 
 logging.info(f"loaded {len(DATA.keys())} datasets.")
 
+DEFAULT_TITLE = "Martin-Villalba Lab Data Explorer"
+
 META_DEFAULT = {
     "filename": "",
     "reference": "",
-    "display": "A290 Molecular Neurobiology Data Viewer",
+    "display": DEFAULT_TITLE,
 }
 
 if os.path.exists(DASH_META_FILE):
@@ -99,11 +101,11 @@ else:
     logging.info(f"Created default metadata")
 
 
-APP = Dash(name=__name__, server=True, title="Molecular Neurobiology Data Explorer")
+APP = Dash(name=__name__, server=True, title=DEFAULT_TITLE)
 
 APP.layout = html.Div([
     html.Header([
-        html.H2("A290 Molecular Neurobiology Data Viewer", id="data-name"),
+        html.H2(DEFAULT_TITLE, id="data-name"),
         html.Div("", id="data-info"),
         html.Div([
             dcc.Dropdown(DATA.keys(), DATA.keys()[0], id="dataset-name", className="", placeholder="Dataset..."), 
