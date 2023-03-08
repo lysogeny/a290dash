@@ -198,3 +198,5 @@ def update_boxplot(dataset_name, gene_id, group_vars):
 
 if __name__ == "__main__":
     APP.run(debug=True if "DASH_DEBUG" in os.environ else False)
+
+SERVER = APP.server
