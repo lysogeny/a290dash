@@ -89,8 +89,8 @@ META_DEFAULT = {
     "display": "A290 Molecular Neurobiology Data Viewer",
 }
 
-if os.path.exists("data/datasets.yaml"):
-    with open("data/datasets.yaml") as connection:
+if os.path.exists(DASH_META_FILE):
+    with open(DASH_META_FILE) as connection:
         DATAMETA = yaml.safe_load(connection)
     DATAMETA = {d["file"].split(".")[0]: d for d in DATAMETA}
     logging.info(f"Including metadata from {DASH_META_FILE}")
