@@ -113,7 +113,7 @@ APP.layout = html.Div([
         html.Div([
             html.Div([
                 dcc.Dropdown(id="selected-embedding", placeholder="Embedding..."),
-                dcc.Dropdown(["gene", "categorical"], id="selected-embedding-source", placeholder="Embedding colour source..."),
+                dcc.Dropdown(["gene", "categorical"], "gene", id="selected-embedding-source", placeholder="Embedding colour source..."),
                 dcc.Dropdown(id="selected-embedding-var", placeholder="Embedding colour variable...")
             ], className="flex-col-top flex-row-container"),
             dcc.Graph(id="graph-umap", className="flex-col-mid", responsive=True),
@@ -129,6 +129,7 @@ APP.layout = html.Div([
     html.Footer(["DKFZ/A290 Dash App"], className="flex-col-bot"),
 ], className="flex-col-container root")
 
+# Callback to update dataset info from metadata.
 @APP.callback(Output("data-info", "children"),
               Input("dataset-name", "value"))
 def update_info(dataset_name):
@@ -139,6 +140,34 @@ def update_info(dataset_name):
         html.A(f"{content}", href=content),
     ])
 
+# Callbacks to update dropdown values if the dataset changed.
+# Check if the available values are in the new dataset, if not, set something else
+# For some reason this is not necessary for the grouping variable dropdown, perhaps because it allows multiple selections?
+@APP.callback(Output("selected-embedding-var", "value"),
+              Input("dataset-name", "value"),
+              Input("selected-embedding-var", "value"))
+def update_embedding_var(dataset_name, selected):
+    if selected in DATA.available_group_vars(dataset_name):
+        return selected
+    return ""
+
+@APP.callback(Output("selected-gene-id", "value"),
+              Input("dataset-name", "value"),
+              Input("selected-gene-id", "value"))
+def update_gene_id(dataset_name, selected):
+    if selected in DATA.available_gene_ids(dataset_name):
+        return selected
+    return ""
+
+@APP.callback(Output("selected-embedding", "value"),
+              Input("dataset-name", "value"),
+              Input("selected-embedding", "value"))
+def update_embedding_value(dataset_name, selected):
+    if selected in DATA.available_embedding_keys(dataset_name):
+        return selected
+    return ""
+
+# Callbacks to update dropdown options if the dataset changed.
 @APP.callback(Output("selected-gene-id", "options"),
               Input("dataset-name", "value"),
               Input("selected-gene-id", "search_value"))
@@ -163,6 +192,7 @@ def update_group_options(dataset_name):
 def update_embedding_cat_options(dataset_name):
     return DATA.available_group_vars(dataset_name)
 
+# Callbacks to update the plots if necessary fields changed.
 @APP.callback(Output("graph-umap", "figure"),
               Input("dataset-name", "value"),
               Input("selected-gene-id", "value"),
