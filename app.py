@@ -108,26 +108,26 @@ APP.layout = html.Div([
         html.Div([
             dcc.Dropdown(DATA.keys(), DATA.keys()[0], id="dataset-name", className="", placeholder="Dataset..."), 
         ], className=""),
-    ], className="row"),
+    ], className="flex-col-top"),
     html.Section([
         html.Div([
             html.Div([
-                dcc.Dropdown(id="selected-embedding", className="flex-child", placeholder="Embedding..."),
-                dcc.Dropdown(["gene", "categorical"], id="selected-embedding-source", className="flex-child", placeholder="Embedding colour source..."),
-                dcc.Dropdown(id="selected-embedding-var", className="flex-child", placeholder="Embedding colour variable...")
-            ], className="flex-container"),
-            dcc.Graph(id="graph-umap", className="graph-output"),
-        ], className="flex-child"), 
+                dcc.Dropdown(id="selected-embedding", placeholder="Embedding..."),
+                dcc.Dropdown(["gene", "categorical"], id="selected-embedding-source", placeholder="Embedding colour source..."),
+                dcc.Dropdown(id="selected-embedding-var", placeholder="Embedding colour variable...")
+            ], className="flex-col-top flex-row-container"),
+            dcc.Graph(id="graph-umap", className="flex-col-mid", responsive=True),
+        ], className="flex-row-element flex-col-container"), 
         html.Div([
             html.Div([
-                dcc.Dropdown(id="selected-grouping-var", className="flex-child", placeholder="Grouping variable...", multi=True),
-                dcc.Dropdown(id="selected-gene-id", className="flex-child", placeholder="Gene Name..."),
-            ], className="flex-container"),
-            dcc.Graph(id="graph-boxes", className="graph-output"),
-        ], className="flex-child"), 
-    ], className="flex-container"),
-    html.Footer(["DKFZ/A290 Dash App"], className="row"),
-], className="box")
+                dcc.Dropdown(id="selected-grouping-var", placeholder="Grouping variable...", multi=True),
+                dcc.Dropdown(id="selected-gene-id", placeholder="Gene Name..."),
+            ], className="flex-col-top flex-row-container"),
+            dcc.Graph(id="graph-boxes", className="flex-col-mid", responsive=True),
+        ], className="flex-row-element flex-col-container"), 
+    ], className="flex-col-mid flex-row-container"),
+    html.Footer(["DKFZ/A290 Dash App"], className="flex-col-bot"),
+], className="flex-col-container root")
 
 @APP.callback(Output("data-info", "children"),
               Input("dataset-name", "value"))
