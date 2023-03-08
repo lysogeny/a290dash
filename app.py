@@ -1,4 +1,6 @@
 import os
+import logging
+
 import yaml
 
 from dash import Dash, dcc, html, Input, Output
@@ -58,13 +60,25 @@ class DataCollection:
     def keys(self):
         return list(self.data.keys())
 
+logging.basicConfig(level=logging.DEBUG if "DASH_DEBUG" in os.environ else logging.ERROR)
+
 if "DASH_DATA_DIR" in os.environ:
     DASH_DATA_DIR = os.environ["DASH_DATA_DIR"]
 else:
     DASH_DATA_DIR = "data"
+DASH_META_FILE = f"{DASH_DATA_DIR}/datasets.yaml"
 
-DATASETS = filter(lambda x: x.endswith(".h5ad"), os.listdir(DASH_DATA_DIR))
+logging.info(f"reading files from `{DASH_DATA_DIR}`")
+
+DATASETS = list(filter(lambda x: x.endswith(".h5ad"), os.listdir(DASH_DATA_DIR)))
+
+logging.info(f"found {len(DATASETS)} files:")
+for line in DATASETS:
+    logging.info(f"File `{line}`")
+
 DATA = DataCollection({dataset.split(".")[0]: anndata.read_h5ad(f"{DASH_DATA_DIR}/{dataset}", backed="r") for dataset in DATASETS})
+
+logging.info(f"loaded {len(DATA.keys())} datasets.")
 
 META_DEFAULT = {
     "filename": "",
@@ -76,8 +90,10 @@ if os.path.exists("data/datasets.yaml"):
     with open("data/datasets.yaml") as connection:
         DATAMETA = yaml.safe_load(connection)
     DATAMETA = {d["file"].split(".")[0]: d for d in DATAMETA}
+    logging.info(f"Including metadata from {DASH_META_FILE}")
 else:
     DATAMETA = {d: META_DEFAULT for d in DATA.keys()}
+    logging.info(f"Created default metadata")
 
 
 APP = Dash(name=__name__, server=True)
@@ -195,6 +211,8 @@ def update_boxplot(dataset_name, gene_id, group_vars):
                  data_frame=plot_data, 
                  template="simple_white")
     return fig
+
+print("App ready!")
 
 if __name__ == "__main__":
     APP.run(debug=True if "DASH_DEBUG" in os.environ else False)
