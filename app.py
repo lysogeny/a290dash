@@ -99,7 +99,7 @@ else:
     logging.info(f"Created default metadata")
 
 
-APP = Dash(name=__name__, server=True)
+APP = Dash(name=__name__, server=True, title="Molecular Neurobiology Data Explorer")
 
 APP.layout = html.Div([
     html.Header([
