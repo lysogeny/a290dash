@@ -107,15 +107,21 @@ if "DASH_DATA_DIR" in os.environ:
     DASH_DATA_DIR = os.environ["DASH_DATA_DIR"]
 else:
     DASH_DATA_DIR = "data"
+if "DASH_TITLE" in os.environ:
+    DASH_TITLE = os.environ["DASH_TITLE"]
+else:
+    DASH_TITLE = "Martin-Villalba Lab Data Explorer"
+
+if "DASH_DEBUG" in os.environ:
+    DASH_TITLE = "(DEBUG) " + DASH_TITLE
 
 DATA = DataCollection(DASH_DATA_DIR)
 
-DEFAULT_TITLE = "Martin-Villalba Lab Data Explorer"
-APP = Dash(name=__name__, server=True, title=DEFAULT_TITLE)
+APP = Dash(name=__name__, server=True, title=DASH_TITLE)
 
 APP.layout = html.Div([
     html.Header([
-        html.H2(DEFAULT_TITLE, id="data-name"),
+        html.H2(DASH_TITLE, id="data-name"),
         html.Div("", id="data-info"),
         html.Div([
             dcc.Dropdown(DATA.keys(), DATA.keys()[0], id="dataset-name", className="", placeholder="Dataset..."), 
