@@ -54,8 +54,9 @@ class DataCollection:
         data = self.data[dataset_name]
         catvars = data.obs.columns[data.obs.dtypes == "category"]
         catvar_counts = pd.Series([len(data.obs[v].cat.categories) for v in catvars])
-        catvars = catvars[(catvar_counts < 24) & (catvar_counts > 1)]
-        return catvars
+        catvars = list(catvars[(catvar_counts < 24) & (catvar_counts > 1)])
+        boolvars = list(data.obs.columns[data.obs.dtypes == "bool"])
+        return [x for x in data.obs.columns if x in (catvars + boolvars)]
 
     def keys(self):
         return list(self.data.keys())
