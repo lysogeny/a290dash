@@ -37,9 +37,14 @@ body {
 .flex-row-container .flex-row-element {
     flex: 1 1 50px;
 }
-.flex-row-container div.dash-dropdown {
+.three-elem-input div.dash-dropdown {
     /* Workaround because dash doesn't let us set the class of this element */
-    flex: 1 1 auto;
+    width: 33.33%;
+    width: calc(100%/3);
+}
+.two-elem-input div.dash-dropdown {
+    /* Workaround because dash doesn't let us set the class of this element */
+    width: 50%
 }
 div.dash-dropdown {
     padding-top: 0.5em;

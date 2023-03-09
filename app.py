@@ -137,14 +137,14 @@ APP.layout = html.Div([
                 dcc.Dropdown(id="selected-embedding", placeholder="Embedding..."),
                 dcc.Dropdown(["gene", "categorical"], "gene", id="selected-embedding-source", placeholder="Embedding colour source..."),
                 dcc.Dropdown(id="selected-embedding-var", placeholder="Embedding colour variable...")
-            ], className="flex-col-top flex-row-container"),
+            ], className="flex-col-top flex-row-container three-elem-input"),
             dcc.Graph(id="graph-umap", className="flex-col-mid", responsive=True),
         ], className="flex-row-element flex-col-container"), 
         html.Div([
             html.Div([
                 dcc.Dropdown(id="selected-grouping-var", placeholder="Grouping variable...", multi=True),
                 dcc.Dropdown(id="selected-gene-id", placeholder="Gene Name..."),
-            ], className="flex-col-top flex-row-container"),
+            ], className="flex-col-top flex-row-container two-elem-input"),
             dcc.Graph(id="graph-boxes", className="flex-col-mid", responsive=True),
         ], className="flex-row-element flex-col-container"), 
     ], className="flex-col-mid flex-row-container"),
