@@ -18,8 +18,8 @@ class DataCollection:
     """Collection of datasets"""
 
     meta_default = {
-        "filename": "",
-        "reference": "",
+        "reference_uri": "",
+        "reference_text": "",
         "display": "",
     }
 
@@ -71,13 +71,9 @@ class DataCollection:
         group_data = data.obs[group_vars]
         return group_data
     
-    def meta_reference(self, dataset_name):
+    def meta_value(self, dataset_name, key):
         meta = self.meta.get(dataset_name, self.meta_default)
-        return meta["reference"]
-
-    def meta_display(self, dataset_name):
-        meta = self.meta.get(dataset_name, self.meta_default)
-        return meta["display"]
+        return meta.get(key, "")
 
     def available_gene_ids(self, dataset_name):
         return self.data[dataset_name].var_names
@@ -98,7 +94,7 @@ class DataCollection:
         return list(self.data.keys())
 
     def keys_dicts(self):
-        return [{"label": self.meta_display(x), "value": x} for x in self.meta.keys()]
+        return [{"label": self.meta_value(x, "display"), "value": x} for x in self.meta.keys()]
 
 
 if "DASH_DEBUG" in os.environ:
@@ -154,11 +150,12 @@ APP.layout = html.Div([
 @APP.callback(Output("data-info", "children"),
               Input("dataset-name", "value"))
 def update_info(dataset_name):
-    content = DATA.meta_reference(dataset_name)
-    display = DATA.meta_display(dataset_name)
+    ref_uri = DATA.meta_value(dataset_name, "reference_uri")
+    ref_text = DATA.meta_value(dataset_name, "reference_text")
+    display = DATA.meta_value(dataset_name, "display")
     return html.P([
-        f"{display}: ",
-        html.A(f"{content}", href=content),
+        f"{display} | ",
+        html.A(f"{ref_text}", href=ref_uri),
     ])
 
 # Callbacks to update dropdown values if the dataset changed.

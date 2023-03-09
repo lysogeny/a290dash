@@ -21,15 +21,17 @@ If a dataset doesn't have metadata specified, a default title will be shown.
 An example yaml looks like this:
 
 ```
-- display: "SVZ WT/IFNAGRKO ageing 10x"
-  file: "ifnagrko.h5ad"
-  reference: "https://doi.org/10.15252/emmm.202216434"
+- display: "10x"dataset
+  file: "data.h5ad"
+  reference_text: "People et al. (2015)"
+  reference_uri: "https://doi.org/doi/doi"
 - display: "Some other dataset"
   file: "cool_data.h5ad"
-  reference: "https://example.com"
+  reference_uri: "https://example.com"
+  reference_text: "Example et al. (2010)"
 ```
 
-This provides information on the data in `cool_data.h5ad` and `ifnagrko.h5ad`.
+This provides information on the data in `cool_data.h5ad` and `data.h5ad`.
 
 Currently, only the keys `display`, `file` and `reference` are read for each dataset.
 Other entries are ignored.
