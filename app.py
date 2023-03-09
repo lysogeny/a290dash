@@ -1,3 +1,4 @@
+from operator import xor
 import os
 import logging
 
@@ -97,6 +98,9 @@ class DataCollection:
     def keys(self):
         return list(self.data.keys())
 
+    def keys_dicts(self):
+        return [{"label": self.meta_display(x), "value": x} for x in self.meta.keys()]
+
 
 if "DASH_DEBUG" in os.environ:
     logging.basicConfig(level=logging.DEBUG)
@@ -124,7 +128,7 @@ APP.layout = html.Div([
         html.H2(DASH_TITLE, id="data-name"),
         html.Div("", id="data-info"),
         html.Div([
-            dcc.Dropdown(DATA.keys(), DATA.keys()[0], id="dataset-name", className="", placeholder="Dataset..."), 
+            dcc.Dropdown(DATA.keys_dicts(), DATA.keys()[0], id="dataset-name", className="", placeholder="Dataset..."), 
         ], className=""),
     ], className="flex-col-top"),
     html.Section([
