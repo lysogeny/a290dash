@@ -17,8 +17,36 @@ import numpy as np
 class DataCollection:
     """Collection of datasets"""
 
-    def __init__(self, data: dict):
-        self.data = data
+    meta_default = {
+        "filename": "",
+        "reference": "",
+        "display": "",
+    }
+
+    def __init__(self, dir):
+        meta_file = f"{dir}/datasets.yaml"
+        self.load_datasets(dir)
+        self.load_metadata(meta_file)
+
+    def load_datasets(self, dir):
+        logging.info(f"reading files from `{DASH_DATA_DIR}`")
+        datasets = list(filter(lambda x: x.endswith(".h5ad"), os.listdir(dir)))
+        logging.info(f"found {len(datasets)} files:")
+        for line in datasets:
+            logging.info(f"File `{line}`")
+        self.data = {dataset.split(".")[0]: anndata.read_h5ad(f"{dir}/{dataset}", backed="r") for dataset in datasets}
+        logging.info(f"loaded {len(self.data.keys())} datasets.")
+
+    def load_metadata(self, meta_file):
+        logging.info(f"reading meta file from `{DASH_DATA_DIR}`")
+        if os.path.exists(meta_file):
+            logging.info(f"Including metadata from {meta_file}")
+            with open(meta_file) as connection:
+                meta = yaml.safe_load(connection)
+            meta = {d["file"].split(".")[0]: d for d in meta}
+        else:
+            meta = {}
+        self.meta = meta
 
     def gene_counts_df(self, dataset_name, gene_id):
         data = self.data[dataset_name]
@@ -42,6 +70,14 @@ class DataCollection:
         data = self.data[dataset_name]
         group_data = data.obs[group_vars]
         return group_data
+    
+    def meta_reference(self, dataset_name):
+        meta = self.meta.get(dataset_name, self.meta_default)
+        return meta["reference"]
+
+    def meta_display(self, dataset_name):
+        meta = self.meta.get(dataset_name, self.meta_default)
+        return meta["display"]
 
     def available_gene_ids(self, dataset_name):
         return self.data[dataset_name].var_names
@@ -61,6 +97,7 @@ class DataCollection:
     def keys(self):
         return list(self.data.keys())
 
+
 if "DASH_DEBUG" in os.environ:
     logging.basicConfig(level=logging.DEBUG)
 else:
@@ -70,38 +107,10 @@ if "DASH_DATA_DIR" in os.environ:
     DASH_DATA_DIR = os.environ["DASH_DATA_DIR"]
 else:
     DASH_DATA_DIR = "data"
-DASH_META_FILE = f"{DASH_DATA_DIR}/datasets.yaml"
 
-logging.info(f"reading files from `{DASH_DATA_DIR}`")
-
-DATASETS = list(filter(lambda x: x.endswith(".h5ad"), os.listdir(DASH_DATA_DIR)))
-
-logging.info(f"found {len(DATASETS)} files:")
-for line in DATASETS:
-    logging.info(f"File `{line}`")
-
-DATA = DataCollection({dataset.split(".")[0]: anndata.read_h5ad(f"{DASH_DATA_DIR}/{dataset}", backed="r") for dataset in DATASETS})
-
-logging.info(f"loaded {len(DATA.keys())} datasets.")
+DATA = DataCollection(DASH_DATA_DIR)
 
 DEFAULT_TITLE = "Martin-Villalba Lab Data Explorer"
-
-META_DEFAULT = {
-    "filename": "",
-    "reference": "",
-    "display": DEFAULT_TITLE,
-}
-
-if os.path.exists(DASH_META_FILE):
-    with open(DASH_META_FILE) as connection:
-        DATAMETA = yaml.safe_load(connection)
-    DATAMETA = {d["file"].split(".")[0]: d for d in DATAMETA}
-    logging.info(f"Including metadata from {DASH_META_FILE}")
-else:
-    DATAMETA = {d: META_DEFAULT for d in DATA.keys()}
-    logging.info(f"Created default metadata")
-
-
 APP = Dash(name=__name__, server=True, title=DEFAULT_TITLE)
 
 APP.layout = html.Div([
@@ -136,8 +145,8 @@ APP.layout = html.Div([
 @APP.callback(Output("data-info", "children"),
               Input("dataset-name", "value"))
 def update_info(dataset_name):
-    content = DATAMETA[dataset_name]["reference"]
-    display = DATAMETA[dataset_name]["display"]
+    content = DATA.meta_reference(dataset_name)
+    display = DATA.meta_display(dataset_name)
     return html.P([
         f"{display}: ",
         html.A(f"{content}", href=content),
