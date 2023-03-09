@@ -1,4 +1,3 @@
-from operator import xor
 import os
 import logging
 
