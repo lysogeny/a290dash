@@ -175,9 +175,9 @@ def update_embedding_value(dataset_name, selected):
               Input("selected-gene-id", "search_value"))
 def update_gene_options(dataset_name, search_value):
     if not search_value:
-        raise PreventUpdate
+        return []
     options = DATA.available_gene_ids(dataset_name)
-    return [o for o in options if search_value in o]
+    return [o for o in options if search_value.lower() in o.lower()]
 
 @APP.callback(Output("selected-embedding", "options"),
               Input("dataset-name", "value"))
