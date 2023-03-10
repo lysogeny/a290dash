@@ -6,7 +6,7 @@ This is the Martin-Villalba Lab's public-facing dash app source code.
 
 The app is configured by the data it is provided and two environment variables:
 
-- `DASH_TITLE` sets the title of the dash app and <h2>.
+- `DASH_TITLE` sets the title of the dash app and `<h2>`.
 - `DASH_DEBUG` sets dash into debug mode. Only use this for development purposes.
 - `DASH_DATA_DIR` is the path of the directory that contains the data and an optional `datasets.yaml`
 
