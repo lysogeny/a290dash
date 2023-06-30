@@ -1,5 +1,10 @@
 FROM python:3.10
 
+LABEL name=a290dash \
+    maintainer="Jooa <j.hooli@dkfz.de>" \
+    description="Interactive single-cell visualisation" \
+    version="0.1.0"
+
 WORKDIR /usr/src/a290dash
 
 ADD app.py .
