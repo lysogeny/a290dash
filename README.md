@@ -67,8 +67,20 @@ Further, all genes in `/X` can be used for colouring the embedding plot or plott
 
 # Running
 
+## With containers
 
-For deployment, a Dockerfile is provided for creating a docker image from this repository.
+Start the app:
+
+```
+podman run -v /srv/dash-data:/data:ro,z -p 3838:8000 -dit --rm ghcr.io/lysogeny/a290dash:latest
+```
+
+- `-v` is necessary to map the directory containing your data (here `/srv/dash-data` to the container).
+- `z` in volume is necessary for linux systems with an enforcing SELinux (e.g. CentOS).
+- `-p` maps the local port to the container port. The first part is what your reverse proxy should be pointing at, the second part shouldn't change.
+
+## Manual
+
 Alternatively, if necessary requirements are present, the app can also be run with `gunicorn`.
 
 ```
@@ -88,62 +100,7 @@ Currently the app doesn't use much memory (<500MB), but this varies depending on
 For python dependencies see either the `pyproject.toml` or `requirements.txt`.
 The docker container only needs a working docker.
 
-## Deployment
-
-Build the docker image. In the project directory run:
-
-```
-docker build --network=host -t a290dash .
-```
-
-Export the docker image:
-
-```
-docker image save a290dash > a290dash.tar.gz
-```
-
-Copy the tarball to a remote host:
-
-```
-scp a290dash.tar.gz {remote_host}
-```
-
-On the remote host, you need to run several commands either as root or a user in a group that is able to control docker.
-Load the tar ball containing our image:
-
-```
-cat a290dash.tar.gz | docker load
-```
-
-If you have the app running (check with `docker ps`), kill it with `docker stop`.
-Then, start the app:
-
-```
-docker run -v /srv/dash-data:/data:ro,z -d -p 3838:8000 -it a290dash
-```
-- `-v` is necessary to map the directory containing your data (here `/srv/dash-data` to the container).
-- `z` in volume is necessary for linux systems with an enforcing SELinux (e.g. CentOS).
-- `-p` maps the local port to the container port. The first part is what your reverse proxy should be pointing at, the second part shouldn't change.
-
-### (Optional) Cleanup
-
-If you had a version of the app running previously, you may want to clean up docker a bit.
-Prune containers:
-
-```
-docker container prune
-```
-
-This will delete all containers that aren't running. Use with caution in systems with many containers or complicated setups.
-Then prune images:
-
-```
-docker image prune
-```
-
-This will delete all unused images. Use with caution in systems with many images or complicated setups.
-
-### Adding data
+## Adding data
 
 With the docker setup described above, copy extra data into `/srv/dash-data`.
 Optionally you may want to add some information about that data in the `datasets.yaml` file.
